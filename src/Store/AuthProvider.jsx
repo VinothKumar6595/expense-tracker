@@ -12,7 +12,7 @@ const AuthProvider = (props) => {
     localStorage.setItem("token", token);
   };
   const authContext = {
-    token: "",
+    token: token,
     login: loginHandler,
     setSignUp: setIsSignedUp,
     isSignedUp: isSignedUp,
