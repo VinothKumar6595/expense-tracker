@@ -1,6 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
 import {
-  confirmEmailVerificationUrl,
   getUserDetailsUrl,
   sendEmailVerificationUrl,
   updateProfileUrl,
