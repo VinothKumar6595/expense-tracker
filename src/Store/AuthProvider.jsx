@@ -6,12 +6,15 @@ const AuthProvider = (props) => {
   const [isSignedUp, setIsSignedUp] = useState(false);
   const initTokenValue = localStorage.getItem("token");
   const [token, setToken] = useState(initTokenValue);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   const loginHandler = (idtoken) => {
     setToken(idtoken);
     localStorage.setItem("token", token);
   };
   const authContext = {
+    isEmailVerified: isEmailVerified,
+    setEmailVerification: setIsEmailVerified,
     token: token,
     login: loginHandler,
     setSignUp: setIsSignedUp,

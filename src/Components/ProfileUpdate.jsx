@@ -1,9 +1,15 @@
 import React, { Fragment, useContext, useEffect, useState } from "react";
-import { getUserDetailsUrl, updateProfileUrl } from "../utils/url";
+import {
+  confirmEmailVerificationUrl,
+  getUserDetailsUrl,
+  sendEmailVerificationUrl,
+  updateProfileUrl,
+} from "../utils/url";
 import AuthContext from "../Store/Auth-Context";
 
 const ProfileUpdate = () => {
   const ctx = useContext(AuthContext);
+
   const [name, setName] = useState("");
   const nameChangeHandler = (event) => {
     setName(event.target.value);
@@ -60,6 +66,29 @@ const ProfileUpdate = () => {
     setName(""), setProfile("");
   };
 
+  const verifyEmailHandler = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(sendEmailVerificationUrl, {
+        method: "POST",
+        body: JSON.stringify({
+          requestType: "VERIFY_EMAIL",
+          idToken: ctx.token,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error.message);
+      }
+      console.log(response);
+      console.log(data);
+      console.log("Email Verification Link sent to email");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
     <Fragment>
       <div
@@ -106,6 +135,14 @@ border-b-solid border-b-2 border-b-black pr-10"
             </div>
           </form>
         </div>
+      </div>
+      <div className="flex">
+        <button
+          className="p-6 bg-slate-500 w-[500px] mt-36 ml-[700px] hover:bg-stone-400 hover:text-white rounded-lg font-semibold text-xl"
+          onClick={verifyEmailHandler}
+        >
+          Verify Your Email Now!!!
+        </button>
       </div>
     </Fragment>
   );
