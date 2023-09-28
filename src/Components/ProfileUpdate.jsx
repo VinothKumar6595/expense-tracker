@@ -92,14 +92,20 @@ const ProfileUpdate = () => {
   return (
     <Fragment>
       <div
-        className="bg-gray-200 h-24  flex items-center justify-between pl-10
+        className="bg-gray-200 h-24  flex items-center pl-10
 border-b-solid border-b-2 border-b-black pr-10"
       >
         <h1 className="text-4xl">Expense Tracker</h1>
-        <h4 className="bg-stone-400 p-2.5 rounded-xl w-96">
+        <h4 className="bg-stone-400 p-2.5 rounded-xl ml-[960px] w-96">
           Your Profile is Incomplete, Please Complete your profile to move
           further...{" "}
         </h4>
+        <button
+          className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
+          onClick={() => ctx.logout()}
+        >
+          Log Out
+        </button>
       </div>
       <div className="w-[1800px] m-auto h-64 border-solid border-b-2 border-b-black pt-10 pl-24">
         <h3 className="font-bold text-lg pb-10 p-3 ">Contact Details</h3>
