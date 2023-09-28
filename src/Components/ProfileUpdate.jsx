@@ -1,5 +1,5 @@
-import React, { Fragment, useContext, useState } from "react";
-import { updateProfileUrl } from "../utils/url";
+import React, { Fragment, useContext, useEffect, useState } from "react";
+import { getUserDetailsUrl, updateProfileUrl } from "../utils/url";
 import AuthContext from "../Store/Auth-Context";
 
 const ProfileUpdate = () => {
@@ -8,9 +8,32 @@ const ProfileUpdate = () => {
   const nameChangeHandler = (event) => {
     setName(event.target.value);
   };
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState("");
   const profilePicHandler = (event) => {
     setProfile(event.target.value);
+  };
+
+  const editProfileHandler = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(getUserDetailsUrl, {
+        method: "POST",
+        body: JSON.stringify({
+          idToken: ctx.token,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error.message);
+      }
+      console.log(data);
+      setName(data.users[0].displayName);
+      setProfile(data.users[0].photoUrl);
+      console.log("Edit User Details Now");
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const updateProfileHandler = async (event) => {
@@ -34,7 +57,6 @@ const ProfileUpdate = () => {
     } catch (error) {
       alert(error.message);
     }
-
     setName(""), setProfile("");
   };
 
@@ -46,29 +68,40 @@ border-b-solid border-b-2 border-b-black pr-10"
       >
         <h1 className="text-4xl">Expense Tracker</h1>
         <h4 className="bg-stone-400 p-2.5 rounded-xl w-96">
-          Your Profile is 64% Completed . Please Complete your profile to move
+          Your Profile is Incomplete, Please Complete your profile to move
           further...{" "}
         </h4>
       </div>
       <div className="w-[1800px] m-auto h-64 border-solid border-b-2 border-b-black pt-10 pl-24">
         <h3 className="font-bold text-lg pb-10 p-3 ">Contact Details</h3>
         <div>
-          <form onSubmit={updateProfileHandler}>
+          <form>
             <label className="font-bold p-3">Full Name</label>
             <input
               type="text"
               className="p-2.5 rounded-md w-96 border-solid border-2 border-black"
               onChange={nameChangeHandler}
+              value={name}
             />
             <label className="font-bold p-3 ml-36">Profile Photo URL</label>
             <input
               type="url"
               className="p-2.5 rounded-md w-96 border-solid border-2 border-black"
               onChange={profilePicHandler}
+              value={profile}
             />
-            <div>
-              <button className="bg-gray-300 p-2 rounded-lg text-black hover:bg-black hover:text-gray-300 mt-8 ml-10">
+            <div className="flex">
+              <button
+                className="bg-gray-300 w-36 p-2 rounded-lg text-black hover:bg-black hover:text-gray-300 mt-8 ml-10"
+                onClick={updateProfileHandler}
+              >
                 Update Profile
+              </button>
+              <button
+                className="bg-gray-300 p-2 w-36 rounded-lg text-black hover:bg-black hover:text-gray-300 mt-8 ml-[1200px]"
+                onClick={editProfileHandler}
+              >
+                Edit Profile
               </button>
             </div>
           </form>
