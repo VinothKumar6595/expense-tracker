@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { logInUrl, signUpUrl } from "../utils/url";
 import AuthContext from "../Store/Auth-Context";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const ctx = useContext(AuthContext);
@@ -23,7 +23,29 @@ const Login = () => {
     event.preventDefault();
     if (!ctx.isSignedUp) {
       if (password === confirm) {
-        const response = await fetch(signUpUrl, {
+        try {
+          const response = await fetch(signUpUrl, {
+            method: "POST",
+            body: JSON.stringify({
+              email: email,
+              password: password,
+              returnSecureToken: true,
+            }),
+            headers: { "Content-Type": "application/json" },
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error.message);
+          }
+        } catch (error) {
+          console.log(error.message);
+        }
+      } else {
+        alert("Password does't match");
+      }
+    } else {
+      try {
+        const response = await fetch(logInUrl, {
           method: "POST",
           body: JSON.stringify({
             email: email,
@@ -33,30 +55,15 @@ const Login = () => {
           headers: { "Content-Type": "application/json" },
         });
         const data = await response.json();
-        try {
-          console.log("User Signed Up Successfully");
-        } catch {
-          console.log(data.error.message);
+        if (!response.ok) {
+          throw new Error(data.error.message);
         }
-      } else {
-        alert("Password does't match");
-      }
-    } else {
-      const response = await fetch(logInUrl, {
-        method: "POST",
-        body: JSON.stringify({
-          email: email,
-          password: password,
-          returnSecureToken: true,
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await response.json();
-      try {
+        console.log(data);
         console.log("User Logged In Successfully");
         navigate("/home");
-      } catch {
-        console.log(data.error.message);
+      } catch (error) {
+        alert(error.message);
+        console.log(error);
       }
     }
     setEmail(""), setPassword(""), setConfirm("");
@@ -97,6 +104,14 @@ const Login = () => {
           <button className="p-3 w-72 mb-2 rounded-lg bg-blue-400 text-white mt-16 hover:bg-white hover:text-blue-400">
             {ctx.isSignedUp ? "Login" : "Sign Up"}
           </button>
+          {ctx.isSignedUp && (
+            <Link
+              to="/changepwd"
+              className="m-auto text-blue-900 border-b-solid border-b-2 border-b-blue-400"
+            >
+              Forgot Password
+            </Link>
+          )}
         </form>
       </div>
       <div className=" flex items-center justify-center  m-auto  ">
