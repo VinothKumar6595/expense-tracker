@@ -60,6 +60,7 @@ const Login = () => {
         }
         console.log(data);
         console.log("User Logged In Successfully");
+        ctx.login(data.idToken);
         navigate("/home");
       } catch (error) {
         alert(error.message);
