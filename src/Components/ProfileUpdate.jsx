@@ -5,9 +5,12 @@ import {
   updateProfileUrl,
 } from "../utils/url";
 import AuthContext from "../Store/Auth-Context";
+import { data } from "autoprefixer";
+import { Link, useNavigate } from "react-router-dom";
 
 const ProfileUpdate = () => {
   const ctx = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const nameChangeHandler = (event) => {
@@ -17,6 +20,32 @@ const ProfileUpdate = () => {
   const profilePicHandler = (event) => {
     setProfile(event.target.value);
   };
+
+  useEffect(() => {
+    fetch(getUserDetailsUrl, {
+      method: "POST",
+      body: JSON.stringify({
+        idToken: ctx.token,
+      }),
+      headers: { "Content-Type": "application/json" },
+    }).then((response) => {
+      if (response.ok) {
+        response.json().then((data) => {
+          console.log(data);
+          console.log(data.users[0].emailVerified);
+          ctx.setEmailVerification(data.users[0].emailVerified);
+          if (
+            data.users[0].displayName.length &&
+            data.users[0].photoUrl.length > 0
+          ) {
+            ctx.setProfileUpdated(true);
+          }
+        });
+      } else {
+        throw new error(data.error.message);
+      }
+    });
+  }, []);
 
   const editProfileHandler = async (event) => {
     event.preventDefault();
@@ -67,24 +96,26 @@ const ProfileUpdate = () => {
 
   const verifyEmailHandler = async (event) => {
     event.preventDefault();
-    try {
-      const response = await fetch(sendEmailVerificationUrl, {
-        method: "POST",
-        body: JSON.stringify({
-          requestType: "VERIFY_EMAIL",
-          idToken: ctx.token,
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error.message);
+    if (!ctx.isEmailVerified) {
+      try {
+        const response = await fetch(sendEmailVerificationUrl, {
+          method: "POST",
+          body: JSON.stringify({
+            requestType: "VERIFY_EMAIL",
+            idToken: ctx.token,
+          }),
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error.message);
+        }
+        console.log(response);
+        console.log(data);
+        console.log("Email Verification Link sent to email");
+      } catch (error) {
+        alert(error.message);
       }
-      console.log(response);
-      console.log(data);
-      console.log("Email Verification Link sent to email");
-    } catch (error) {
-      alert(error.message);
     }
   };
 
@@ -96,8 +127,9 @@ border-b-solid border-b-2 border-b-black pr-10"
       >
         <h1 className="text-4xl">Expense Tracker</h1>
         <h4 className="bg-stone-400 p-2.5 rounded-xl ml-[960px] w-96">
-          Your Profile is Incomplete, Please Complete your profile to move
-          further...{" "}
+          {ctx.isProfileUpdated
+            ? "User Profile is 100% Updated ! Move Forward to adding Expenses"
+            : "Your Profile is Incomplete, Please Complete your profile to move further..."}
         </h4>
         <button
           className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
@@ -146,8 +178,20 @@ border-b-solid border-b-2 border-b-black pr-10"
           className="p-6 bg-slate-500 w-[500px] mt-36 ml-[700px] hover:bg-stone-400 hover:text-white rounded-lg font-semibold text-xl"
           onClick={verifyEmailHandler}
         >
-          Verify Your Email Now!!!
+          {ctx.isEmailVerified
+            ? "Your Email is Verified"
+            : "Verify Your Email Now!!!"}
         </button>
+      </div>
+      <div>
+        {ctx.isLoggedIn && (
+          <button
+            className="p-6 bg-blue-500 w-[500px] mt-36 ml-[700px] hover:bg-blue-300 hover:text-white rounded-lg font-semibold text-xl"
+            onClick={() => navigate("/expenses")}
+          >
+            Add Expenses
+          </button>
+        )}
       </div>
     </Fragment>
   );
