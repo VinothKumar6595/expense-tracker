@@ -8,29 +8,33 @@ const AuthProvider = (props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(initLoggedInValue);
   const [isSignedUp, setIsSignedUp] = useState(false);
   const initTokenValue = localStorage.getItem("token");
-
   const [token, setToken] = useState(initTokenValue);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
-
+  const initEndPoint = localStorage.getItem("endpoint");
+  const [endpoint, setEndPoint] = useState(initEndPoint);
   const [profileUpdated, setProfileUpdated] = useState(false);
 
-  const loginHandler = (idtoken) => {
+  const loginHandler = (idtoken, endpoint) => {
     setToken(idtoken);
     localStorage.setItem("token", idtoken);
     setIsLoggedIn(true);
     localStorage.setItem("isLoggedIn", true);
+    setEndPoint(endpoint);
+    localStorage.setItem("endpoint", endpoint);
   };
 
   const logoutHandler = () => {
     setToken(null);
     localStorage.removeItem("token");
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("endpoint");
     navigate("/auth");
   };
 
   const authContext = {
     isEmailVerified: isEmailVerified,
     isProfileUpdated: profileUpdated,
+    endpoint: endpoint,
     setEmailVerification: setIsEmailVerified,
     setProfileUpdated: setProfileUpdated,
     token: token,

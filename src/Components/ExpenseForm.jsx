@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthContext from "../Store/Auth-Context";
+import { addExpenseUrl } from "../utils/url";
 
 const ExpenseForm = (props) => {
+  const ctx = useContext(AuthContext);
   const navigate = useNavigate("");
   const [spentMoney, setSpentMoney] = useState("");
   const moneyChangeHandler = (event) => {
@@ -15,14 +19,26 @@ const ExpenseForm = (props) => {
   const categoryChangeHandler = (event) => {
     setCategory(event.target.value);
   };
-  const addExpenseHandler = (event) => {
+  const addExpenseHandler = async (event) => {
     event.preventDefault();
     const myExpense = {
       spentMoney: spentMoney,
       expense: expense,
       category: category,
     };
-    props.onAddExpense(myExpense);
+    try {
+      const response = await axios.post(
+        addExpenseUrl,
+        JSON.stringify(myExpense)
+      );
+      console.log(response.data);
+      props.onAddExpense();
+      // const data = await response.json();
+      // console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+    // props.onAddExpense(myExpense);
     setSpentMoney("");
     setCategory("");
     SetExpense("");

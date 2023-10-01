@@ -53,7 +53,7 @@ const Home = () => {
       )}
       {ctx.isProfileUpdated && (
         <h4 className="bg-stone-400 p-2.5 rounded-3xl ml-96  w-[800px] flex">
-          Welcome Back <h6 className="font-bold ml-1">{dispName}</h6> ! your
+          Welcome Back <p className="font-bold ml-1">{dispName}</p> ! your
           Profile is 100% Completed.Go To
           <Link
             to="/expenses"

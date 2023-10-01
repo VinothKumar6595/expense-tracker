@@ -21,6 +21,7 @@ const Login = () => {
 
   const formSubmitHandler = async (event) => {
     event.preventDefault();
+    const endPoints = `/${email.replace(/\.|@/g, "")}`;
     if (!ctx.isSignedUp) {
       if (password === confirm) {
         try {
@@ -36,6 +37,8 @@ const Login = () => {
           const data = await response.json();
           if (!response.ok) {
             throw new Error(data.error.message);
+          } else {
+            alert("User Sign up Successfull !!!");
           }
         } catch (error) {
           console.log(error.message);
@@ -60,7 +63,7 @@ const Login = () => {
         }
         console.log(data);
         console.log("User Logged In Successfully");
-        ctx.login(data.idToken);
+        ctx.login(data.idToken, endPoints);
         navigate("/home");
       } catch (error) {
         alert(error.message);
