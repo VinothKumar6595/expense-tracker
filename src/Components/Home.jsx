@@ -41,8 +41,8 @@ const Home = () => {
       {" "}
       <h1 className="text-4xl w-[800px]">Welcome To Expense Tracker!!!</h1>
       {!ctx.isProfileUpdated && (
-        <h4 className="bg-stone-400 p-2.5 rounded-3xl ml-[780px]">
-          Your Profile is incomplete. {""}
+        <h4 className="bg-stone-400 p-2.5 rounded-3xl ml-[700px] w-[500px]">
+          Your Profile is incomplete.{" "}
           <Link
             to="/profile"
             className="m-auto text-lg text-blue-900 border-b-solid border-b-2 border-b-blue-400"

@@ -7,42 +7,62 @@ import { addExpenseUrl } from "../utils/url";
 const ExpenseForm = (props) => {
   const ctx = useContext(AuthContext);
   const navigate = useNavigate("");
-  const [spentMoney, setSpentMoney] = useState("");
+
   const moneyChangeHandler = (event) => {
-    setSpentMoney(event.target.value);
+    props.setSpentMoney(event.target.value);
   };
-  const [expense, SetExpense] = useState("");
   const expenseChangeHandler = (event) => {
-    SetExpense(event.target.value);
+    props.SetExpense(event.target.value);
   };
-  const [category, setCategory] = useState("");
   const categoryChangeHandler = (event) => {
-    setCategory(event.target.value);
+    props.setCategory(event.target.value);
   };
+
   const addExpenseHandler = async (event) => {
     event.preventDefault();
     const myExpense = {
-      spentMoney: spentMoney,
-      expense: expense,
-      category: category,
+      spentMoney: props.spentMoney,
+      expense: props.expense,
+      category: props.category,
     };
-    try {
-      const response = await axios.post(
-        addExpenseUrl,
-        JSON.stringify(myExpense)
-      );
-      console.log(response.data);
-      props.onAddExpense();
-      // const data = await response.json();
-      // console.log(data);
-    } catch (error) {
-      console.log(error);
+    if (!ctx.editExpense) {
+      try {
+        const response = await axios.post(
+          `${addExpenseUrl}${ctx.endpoint}/expenses.json`,
+          JSON.stringify(myExpense)
+        );
+        console.log(response.data);
+        props.onAddExpense();
+        // const data = await response.json();
+        // console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const editedExpense = {
+          spentMoney: props.spentMoney,
+          expense: props.expense,
+          category: props.category,
+        };
+        const response = await axios.put(
+          `${addExpenseUrl}${ctx.endpoint}/expenses/${props.id}.json`,
+          JSON.stringify(editedExpense)
+        );
+        console.log(response.data);
+        console.log("Edited SuccessFully");
+        props.onAddExpense();
+      } catch (error) {
+        console.log(error);
+      }
     }
     // props.onAddExpense(myExpense);
-    setSpentMoney("");
-    setCategory("");
-    SetExpense("");
+    props.setSpentMoney("");
+    props.setCategory("");
+    props.SetExpense("");
+    // props.setId("");
   };
+
   return (
     <div>
       <div
@@ -72,7 +92,7 @@ const ExpenseForm = (props) => {
             type="number"
             className="p-2.5 mr-5 rounded-xl"
             onChange={moneyChangeHandler}
-            value={spentMoney}
+            value={props.spentMoney}
             required
           />
           <label className="p-5">Expense Description</label>
@@ -80,7 +100,7 @@ const ExpenseForm = (props) => {
             type="text"
             className="p-2.5 mr-5 rounded-xl"
             onChange={expenseChangeHandler}
-            value={expense}
+            value={props.expense}
             required
           />
           <label className="p-5">Choose a Category</label>
@@ -88,7 +108,7 @@ const ExpenseForm = (props) => {
             list="category"
             className="p-2.5 mr-5 rounded-xl"
             onChange={categoryChangeHandler}
-            value={category}
+            value={props.category}
             required
           />
           <datalist id="category">
@@ -99,7 +119,7 @@ const ExpenseForm = (props) => {
             <option value="Salary" />
           </datalist>
           <button className="bg-white p-2.5 rounded-3xl hover:bg-black hover:text-white">
-            Add Expenses
+            {ctx.editExpense ? "Edit Expense" : "Add Expenses"}
           </button>
         </form>
       </div>

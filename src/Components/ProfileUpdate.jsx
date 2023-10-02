@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 const ProfileUpdate = () => {
   const ctx = useContext(AuthContext);
+  const endpoint = localStorage.getItem("endpoint");
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -22,7 +23,7 @@ const ProfileUpdate = () => {
   };
 
   useEffect(() => {
-    fetch(getUserDetailsUrl, {
+    fetch(`${getUserDetailsUrl}`, {
       method: "POST",
       body: JSON.stringify({
         idToken: ctx.token,
@@ -88,6 +89,7 @@ const ProfileUpdate = () => {
         throw new Error(data.Error.message);
       }
       console.log("User Profile Updated");
+      navigate("/home");
     } catch (error) {
       alert(error.message);
     }
@@ -184,7 +186,7 @@ border-b-solid border-b-2 border-b-black pr-10"
         </button>
       </div>
       <div>
-        {ctx.isLoggedIn && (
+        {ctx.isLoggedIn && ctx.isProfileUpdated && (
           <button
             className="p-6 bg-blue-500 w-[500px] mt-36 ml-[700px] hover:bg-blue-300 hover:text-white rounded-lg font-semibold text-xl"
             onClick={() => navigate("/expenses")}

@@ -13,6 +13,7 @@ const AuthProvider = (props) => {
   const initEndPoint = localStorage.getItem("endpoint");
   const [endpoint, setEndPoint] = useState(initEndPoint);
   const [profileUpdated, setProfileUpdated] = useState(false);
+  const [editExpense, setEditExpense] = useState(false);
 
   const loginHandler = (idtoken, endpoint) => {
     setToken(idtoken);
@@ -24,10 +25,13 @@ const AuthProvider = (props) => {
   };
 
   const logoutHandler = () => {
-    setToken(null);
     localStorage.removeItem("token");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("endpoint");
+    localStorage.clear();
+    setToken(null);
+    setEndPoint("");
+    setIsLoggedIn(false);
     navigate("/auth");
   };
 
@@ -35,6 +39,8 @@ const AuthProvider = (props) => {
     isEmailVerified: isEmailVerified,
     isProfileUpdated: profileUpdated,
     endpoint: endpoint,
+    editExpense: editExpense,
+    setEditExpense: setEditExpense,
     setEmailVerification: setIsEmailVerified,
     setProfileUpdated: setProfileUpdated,
     token: token,
