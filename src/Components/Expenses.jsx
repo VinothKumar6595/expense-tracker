@@ -3,39 +3,29 @@ import ExpenseForm from "./ExpenseForm";
 import axios from "axios";
 import { addExpenseUrl } from "../utils/url";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../Store/Auth-Context";
+// import AuthContext from "../Store/Auth-Context";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../Store/redux";
+import { editActions } from "../Store/EditSlice";
+import { expenseActions } from "../Store/Expenses";
+import { current } from "@reduxjs/toolkit";
 
 const Expenses = (props) => {
-  const ctx = useContext(AuthContext);
+  // const ctx = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const endpoint = localStorage.getItem("endpoint");
+  const isEditing = useSelector((state) => state.editing.isEditing);
   const [spentMoney, setSpentMoney] = useState("");
   const [expense, SetExpense] = useState("");
   const [expenseList, setExpenseList] = useState([]);
   const [category, setCategory] = useState("");
-  // const [id, setId] = useState("");
+  const [id, setId] = useState("");
+  const expensesFromRedux = useSelector((state) => state.expenses.expenses);
+
   useEffect(() => {
     console.log(localStorage.getItem("endpoint"));
-    axios
-      .get(`${addExpenseUrl}${ctx.endpoint}/expenses.json`)
-      .then((response) => {
-        const expenses = [];
-        console.log(response.data);
-        for (const key in response.data) {
-          expenses.push({
-            id: key,
-            spentMoney: response.data[key].spentMoney,
-            expense: response.data[key].expense,
-            category: response.data[key].category,
-          });
-        }
-        setExpenseList(expenses);
-        console.log(expenseList);
-      });
-  }, []);
-  const expenseAddHandler = async () => {
-    try {
-      const response = await axios(
-        `${addExpenseUrl}${ctx.endpoint}/expenses.json`
-      );
+    console.log(endpoint);
+    axios.get(`${addExpenseUrl}${endpoint}/expenses.json`).then((response) => {
       const expenses = [];
       console.log(response.data);
       for (const key in response.data) {
@@ -47,8 +37,39 @@ const Expenses = (props) => {
         });
       }
       setExpenseList(expenses);
+      dispatch(expenseActions.addToExpense(expenses));
       console.log(expenseList);
-      ctx.setEditExpense(false);
+      console.log(expensesFromRedux);
+      const totalExpense = expensesFromRedux.reduce((curr, expense) => {
+        return (curr = curr + Number(expense.spentMoney));
+      }, 0);
+      console.log(totalExpense);
+    });
+  }, []);
+  const expenseAddHandler = async () => {
+    try {
+      const response = await axios(`${addExpenseUrl}${endpoint}/expenses.json`);
+      const expenses = [];
+      console.log(response.data);
+      for (const key in response.data) {
+        expenses.push({
+          id: key,
+          spentMoney: response.data[key].spentMoney,
+          expense: response.data[key].expense,
+          category: response.data[key].category,
+        });
+      }
+
+      setExpenseList(expenses);
+      dispatch(expenseActions.addToExpense(expenses));
+      console.log(expenseList);
+      const totalExpense = expensesFromRedux.reduce((curr, expense) => {
+        return (curr = curr + Number(expense.spentMoney));
+      }, 0);
+      console.log(totalExpense);
+
+      // ctx.setEditExpense(false);
+      dispatch(editActions.stopEditing());
     } catch (error) {
       console.log(error);
     }
@@ -56,26 +77,30 @@ const Expenses = (props) => {
 
   const expenseDeleteHandler = async (id) => {
     const response = await axios.delete(
-      `${addExpenseUrl}${ctx.endpoint}/expenses/${id}.json`
+      `${addExpenseUrl}${endpoint}/expenses/${id}.json`
     );
     console.log("Expense Deleted SuccessFully");
     console.log(response);
-    axios
-      .get(`${addExpenseUrl}${ctx.endpoint}/expenses.json`)
-      .then((response) => {
-        const expenses = [];
-        console.log(response.data);
-        for (const key in response.data) {
-          expenses.push({
-            id: key,
-            spentMoney: response.data[key].spentMoney,
-            expense: response.data[key].expense,
-            category: response.data[key].category,
-          });
-        }
-        setExpenseList(expenses);
-        console.log(expenseList);
-      });
+    axios.get(`${addExpenseUrl}${endpoint}/expenses.json`).then((response) => {
+      const expenses = [];
+      console.log(response.data);
+      for (const key in response.data) {
+        expenses.push({
+          id: key,
+          spentMoney: response.data[key].spentMoney,
+          expense: response.data[key].expense,
+          category: response.data[key].category,
+        });
+      }
+      setExpenseList(expenses);
+      dispatch(expenseActions.addToExpense(expenses));
+      console.log(expenseList);
+      console.log(expensesFromRedux);
+      const totalExpense = expensesFromRedux.reduce((curr, expense) => {
+        return (curr = curr + Number(expense.spentMoney));
+      }, 0);
+      console.log(totalExpense);
+    });
   };
 
   const editExpenseHandler = async (id) => {
@@ -86,8 +111,8 @@ const Expenses = (props) => {
     setCategory(filteredExpense[0].category);
     SetExpense(filteredExpense[0].expense);
     setSpentMoney(filteredExpense[0].spentMoney);
-    setId(id);
-    ctx.setEditExpense(true);
+    setId(filteredExpense[0].id);
+    dispatch(editActions.editUser());
   };
 
   const listOfExpenses = expenseList.map((expense) => {
@@ -125,8 +150,8 @@ const Expenses = (props) => {
         SetExpense={SetExpense}
         category={category}
         setCategory={setCategory}
-        // id={id}
-        // setId={setId}
+        id={id}
+        setId={setId}
       />
       <div>
         <ul>{listOfExpenses}</ul>

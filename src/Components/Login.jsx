@@ -1,15 +1,27 @@
 import React, { useContext, useState } from "react";
 import { logInUrl, signUpUrl } from "../utils/url";
-import AuthContext from "../Store/Auth-Context";
+// import AuthContext from "../Store/Auth-Context";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../Store/redux";
 
 const Login = () => {
-  const ctx = useContext(AuthContext);
+  // const ctx = useContext(AuthContext);
+  const dispatch = useDispatch();
+
   const navigate = useNavigate();
+  // const isloggedIn = useSelector((state) => state.auth.isloggedIn);
+  const isloggedIn = localStorage.getItem("isLoggedIn");
+  console.log(isloggedIn);
+  const isSignedUp = useSelector((state) => state.auth.isSignedUp);
+  const token = localStorage.getItem("token");
   const [email, setEmail] = useState("");
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
   };
+  // const endpoint = useSelector(
+  //   (state) => (state.auth.endpoint = `/${email.replace(/\.|@/g, "")}`)
+  // );
   const [password, setPassword] = useState("");
   const passwordChangeHandler = (event) => {
     setPassword(event.target.value);
@@ -22,7 +34,9 @@ const Login = () => {
   const formSubmitHandler = async (event) => {
     event.preventDefault();
     const endPoints = `/${email.replace(/\.|@/g, "")}`;
-    if (!ctx.isSignedUp) {
+    // localStorage.setItem("endPoints", endPoints);
+
+    if (!isSignedUp) {
       if (password === confirm) {
         try {
           const response = await fetch(signUpUrl, {
@@ -63,7 +77,10 @@ const Login = () => {
         }
         console.log(data);
         console.log("User Logged In Successfully");
-        ctx.login(data.idToken, endPoints);
+        // ctx.login(data.idToken, endPoints);
+        // localStorage.setItem("endpoint", endPoint);
+        dispatch(authActions.endpoint(endPoints));
+        dispatch(authActions.login(data.idToken));
         navigate("/home");
       } catch (error) {
         alert(error.message);
@@ -77,7 +94,7 @@ const Login = () => {
       <div className="bg-gray-400 flex items-center justify-center w-[360px] h-[440px] m-auto rounded-xl ">
         <form className="flex flex-col" onSubmit={formSubmitHandler}>
           <h1 className=" flex justify-center text-2xl font-semibold mb-16">
-            {ctx.isSignedUp ? "Log In" : "Sign-Up"}
+            {isSignedUp ? "Log In" : "Sign-Up"}
           </h1>
           <input
             type="email"
@@ -95,7 +112,7 @@ const Login = () => {
             onChange={passwordChangeHandler}
             value={password}
           />
-          {!ctx.isSignedUp && (
+          {!isSignedUp && (
             <input
               type="password"
               placeholder="Confirm Password"
@@ -106,9 +123,9 @@ const Login = () => {
             />
           )}
           <button className="p-3 w-72 mb-2 rounded-lg bg-blue-400 text-white mt-16 hover:bg-white hover:text-blue-400">
-            {ctx.isSignedUp ? "Login" : "Sign Up"}
+            {isSignedUp ? "Login" : "Sign Up"}
           </button>
-          {ctx.isSignedUp && (
+          {isSignedUp && (
             <Link
               to="/changepwd"
               className="m-auto text-blue-900 border-b-solid border-b-2 border-b-blue-400"
@@ -121,9 +138,9 @@ const Login = () => {
       <div className=" flex items-center justify-center  m-auto  ">
         <button
           className="p-3 w-[360px]  rounded-lg bg-blue-400 text-white mt-10 hover:bg-gray-400 hover:text-white"
-          onClick={() => ctx.setSignUp((prev) => !prev)}
+          onClick={() => dispatch(authActions.signUp())}
         >
-          {ctx.isSignedUp
+          {isSignedUp
             ? "Don't have an account? Sign-Up"
             : "Have an Account? Login"}
         </button>

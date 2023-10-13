@@ -1,9 +1,14 @@
 import React, { useContext, useState } from "react";
 import { changePwdUrl } from "../utils/url";
-import AuthContext from "../Store/Auth-Context";
+// import AuthContext from "../Store/Auth-Context";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../Store/redux";
 
 const ChangePassword = () => {
-  const ctx = useContext(AuthContext);
+  // const ctx = useContext(AuthContext);
+  const dispatch = useDispatch();
+  // const isloggedIn = useSelector((state) => state.auth.isloggedIn);
+  const isloggedIn = localStorage.getItem("isLoggedIn");
   const [email, setEmail] = useState("");
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
@@ -38,12 +43,14 @@ const ChangePassword = () => {
 border-b-solid border-b-2 border-b-black pr-10"
       >
         <h1 className="text-4xl">Expense Tracker</h1>
-        <button
-          className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
-          onClick={() => ctx.logout()}
-        >
-          Log Out
-        </button>
+        {isloggedIn && (
+          <button
+            className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
+            onClick={() => dispatch(authActions.logout())}
+          >
+            Log Out
+          </button>
+        )}
       </div>
       <div className="flex flex-col w-96 mt-64 ml-[700px] ">
         <form>

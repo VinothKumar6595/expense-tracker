@@ -4,13 +4,24 @@ import {
   sendEmailVerificationUrl,
   updateProfileUrl,
 } from "../utils/url";
-import AuthContext from "../Store/Auth-Context";
+// import AuthContext from "../Store/Auth-Context";
 import { data } from "autoprefixer";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { profileActions } from "../Store/ProfileSlice";
+import { authActions } from "../Store/redux";
 
 const ProfileUpdate = () => {
-  const ctx = useContext(AuthContext);
+  // const ctx = useContext(AuthContext);
+  const dispatch = useDispatch();
   const endpoint = localStorage.getItem("endpoint");
+  const token = useSelector((state) => state.auth.token);
+  const isEmailVerified = useSelector((state) => state.profile.isEmailVerified);
+  const isProfileUpdated = useSelector(
+    (state) => state.profile.isProfileUpdated
+  );
+  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -26,7 +37,7 @@ const ProfileUpdate = () => {
     fetch(`${getUserDetailsUrl}`, {
       method: "POST",
       body: JSON.stringify({
-        idToken: ctx.token,
+        idToken: token,
       }),
       headers: { "Content-Type": "application/json" },
     }).then((response) => {
@@ -34,12 +45,15 @@ const ProfileUpdate = () => {
         response.json().then((data) => {
           console.log(data);
           console.log(data.users[0].emailVerified);
-          ctx.setEmailVerification(data.users[0].emailVerified);
+          // ctx.setEmailVerification(data.users[0].emailVerified);
+          dispatch(
+            profileActions.emailVerification(data.users[0].emailVerified)
+          );
           if (
             data.users[0].displayName.length &&
             data.users[0].photoUrl.length > 0
           ) {
-            ctx.setProfileUpdated(true);
+            dispatch(profileActions.profileUpdation());
           }
         });
       } else {
@@ -54,7 +68,7 @@ const ProfileUpdate = () => {
       const response = await fetch(getUserDetailsUrl, {
         method: "POST",
         body: JSON.stringify({
-          idToken: ctx.token,
+          idToken: token,
         }),
         headers: { "Content-Type": "application/json" },
       });
@@ -77,7 +91,7 @@ const ProfileUpdate = () => {
       const response = await fetch(updateProfileUrl, {
         method: "POST",
         body: JSON.stringify({
-          idToken: ctx.token,
+          idToken: token,
           displayName: name,
           photoUrl: profile,
           returnSecureToken: false,
@@ -98,13 +112,13 @@ const ProfileUpdate = () => {
 
   const verifyEmailHandler = async (event) => {
     event.preventDefault();
-    if (!ctx.isEmailVerified) {
+    if (!isEmailVerified) {
       try {
         const response = await fetch(sendEmailVerificationUrl, {
           method: "POST",
           body: JSON.stringify({
             requestType: "VERIFY_EMAIL",
-            idToken: ctx.token,
+            idToken: token,
           }),
           headers: { "Content-Type": "application/json" },
         });
@@ -129,13 +143,13 @@ border-b-solid border-b-2 border-b-black pr-10"
       >
         <h1 className="text-4xl">Expense Tracker</h1>
         <h4 className="bg-stone-400 p-2.5 rounded-xl ml-[960px] w-96">
-          {ctx.isProfileUpdated
+          {isProfileUpdated
             ? "User Profile is 100% Updated ! Move Forward to adding Expenses"
             : "Your Profile is Incomplete, Please Complete your profile to move further..."}
         </h4>
         <button
           className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
-          onClick={() => ctx.logout()}
+          onClick={() => dispatch(authActions.logout())}
         >
           Log Out
         </button>
@@ -180,13 +194,13 @@ border-b-solid border-b-2 border-b-black pr-10"
           className="p-6 bg-slate-500 w-[500px] mt-36 ml-[700px] hover:bg-stone-400 hover:text-white rounded-lg font-semibold text-xl"
           onClick={verifyEmailHandler}
         >
-          {ctx.isEmailVerified
+          {isEmailVerified
             ? "Your Email is Verified"
             : "Verify Your Email Now!!!"}
         </button>
       </div>
       <div>
-        {ctx.isLoggedIn && ctx.isProfileUpdated && (
+        {isLoggedIn && isProfileUpdated && (
           <button
             className="p-6 bg-blue-500 w-[500px] mt-36 ml-[700px] hover:bg-blue-300 hover:text-white rounded-lg font-semibold text-xl"
             onClick={() => navigate("/expenses")}

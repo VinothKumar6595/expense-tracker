@@ -1,11 +1,17 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthContext from "../Store/Auth-Context";
+// import AuthContext from "../Store/Auth-Context";
 import { addExpenseUrl } from "../utils/url";
+import { useDispatch, useSelector } from "react-redux";
+import { profileActions } from "../Store/ProfileSlice";
+import { authActions } from "../Store/redux";
 
 const ExpenseForm = (props) => {
-  const ctx = useContext(AuthContext);
+  // const ctx = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const editExpense = useSelector((state) => state.editing.isEditing);
+  const endpoint = localStorage.getItem("endpoint");
   const navigate = useNavigate("");
 
   const moneyChangeHandler = (event) => {
@@ -25,16 +31,14 @@ const ExpenseForm = (props) => {
       expense: props.expense,
       category: props.category,
     };
-    if (!ctx.editExpense) {
+    if (!editExpense) {
       try {
         const response = await axios.post(
-          `${addExpenseUrl}${ctx.endpoint}/expenses.json`,
+          `${addExpenseUrl}${endpoint}/expenses.json`,
           JSON.stringify(myExpense)
         );
         console.log(response.data);
         props.onAddExpense();
-        // const data = await response.json();
-        // console.log(data);
       } catch (error) {
         console.log(error);
       }
@@ -46,7 +50,7 @@ const ExpenseForm = (props) => {
           category: props.category,
         };
         const response = await axios.put(
-          `${addExpenseUrl}${ctx.endpoint}/expenses/${props.id}.json`,
+          `${addExpenseUrl}${endpoint}/expenses/${props.id}.json`,
           JSON.stringify(editedExpense)
         );
         console.log(response.data);
@@ -60,7 +64,7 @@ const ExpenseForm = (props) => {
     props.setSpentMoney("");
     props.setCategory("");
     props.SetExpense("");
-    // props.setId("");
+    props.setId("");
   };
 
   return (
@@ -73,14 +77,20 @@ const ExpenseForm = (props) => {
         <h1
           className="text-4xl font-serif font-bold hover:cursor-pointer"
           onClick={() => {
-            navigate("/");
+            navigate("/home");
           }}
         >
           Expense Tracker
         </h1>
+        {/* <button
+          className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
+          onClick={() => navigate("/profile")}
+        >
+          Edit Profile
+        </button> */}
         <button
           className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
-          onClick={() => ctx.logout()}
+          onClick={() => dispatch(authActions.logout(navigate("/auth")))}
         >
           Log Out
         </button>
@@ -119,7 +129,7 @@ const ExpenseForm = (props) => {
             <option value="Salary" />
           </datalist>
           <button className="bg-white p-2.5 rounded-3xl hover:bg-black hover:text-white">
-            {ctx.editExpense ? "Edit Expense" : "Add Expenses"}
+            {editExpense ? "Edit Expense" : "Add Expenses"}
           </button>
         </form>
       </div>

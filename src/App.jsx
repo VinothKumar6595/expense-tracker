@@ -4,24 +4,36 @@ import Home from "./Components/Home";
 import ProfileUpdate from "./Components/ProfileUpdate";
 import ChangePassword from "./Components/ChangePassword";
 import Expenses from "./Components/Expenses";
-import { useContext } from "react";
-import AuthContext from "./Store/Auth-Context";
+import { useContext, useEffect, useState } from "react";
+// import AuthContext from "./Store/Auth-Context";
+import { useSelector } from "react-redux";
 
 export default function App() {
-  const ctx = useContext(AuthContext);
+  // const ctx = useContext(AuthContext);
+  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+  console.log(isLoggedIn);
   return (
     <Routes>
       <Route
         path="/"
-        element={
-          ctx.isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/auth" />
-        }
+        element={isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/auth" />}
       />
       <Route path="/auth" element={<Login />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/profile" element={<ProfileUpdate />} />
-      <Route path="/changepwd" element={<ChangePassword />} />
-      <Route path="/expenses" element={<Expenses />} />
+      <Route
+        path="/home"
+        element={isLoggedIn ? <Home /> : <Navigate to="/auth" />}
+      />
+      <Route
+        path="/profile"
+        element={isLoggedIn ? <ProfileUpdate /> : <Navigate to="/auth" />}
+      />
+      <Route path="/changepwd" element={!isLoggedIn && <ChangePassword />} />
+      <Route
+        path="/expenses"
+        element={isLoggedIn ? <Expenses /> : <Navigate to="/auth" />}
+      />
     </Routes>
   );
 }
