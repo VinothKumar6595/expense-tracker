@@ -11,7 +11,13 @@ import { useSelector } from "react-redux";
 export default function App() {
   // const ctx = useContext(AuthContext);
   // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+  const [isLoggedIn, setISLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const initialState = localStorage.getItem("isLoggedIn");
+    initialState && setISLoggedIn(true);
+  });
 
   console.log(isLoggedIn);
   return (

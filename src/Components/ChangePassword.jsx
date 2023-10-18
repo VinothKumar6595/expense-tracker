@@ -4,11 +4,15 @@ import { changePwdUrl } from "../utils/url";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../Store/redux";
 
+import DarkTheme from "./DarkTheme";
+
 const ChangePassword = () => {
   // const ctx = useContext(AuthContext);
   const dispatch = useDispatch();
   // const isloggedIn = useSelector((state) => state.auth.isloggedIn);
   const isloggedIn = localStorage.getItem("isLoggedIn");
+  const darkMode = useSelector((state) => state.darkTheme.darkTheme);
+  const isPremium = useSelector((state) => state.expenses.isPremium);
   const [email, setEmail] = useState("");
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
@@ -36,23 +40,36 @@ const ChangePassword = () => {
     setEmail("");
   };
   return (
-    <div>
+    <div
+      className={`${
+        darkMode ? "bg-black text-white" : "bg-white text-black"
+      } h-[980px]`}
+    >
       {" "}
       <div
-        className="bg-gray-200 h-24  flex justify-between items-center pl-10
-border-b-solid border-b-2 border-b-black pr-10"
+        className={` flex ${
+          darkMode
+            ? "bg-black text-white border-b-solid border-b-2 border-b-white"
+            : "bg-gray-200 text-black border-b-solid border-b-2 border-b-black"
+        } h-24  justify-between items-center pl-10
+ pr-10`}
       >
         <h1 className="text-4xl">Expense Tracker</h1>
+        {isPremium && (
+          <div className="ml-[1200px]">
+            <DarkTheme />
+          </div>
+        )}
         {isloggedIn && (
           <button
             className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
-            onClick={() => dispatch(authActions.logout())}
+            onClick={() => dispatch(authActions.logout(navigate("/auth")))}
           >
             Log Out
           </button>
         )}
       </div>
-      <div className="flex flex-col w-96 mt-64 ml-[700px] ">
+      <div className={`flex flex-col  w-96 mt-64 ml-[700px] `}>
         <form>
           <label className="ml-16 font-bold ">
             Enter the email which you have registered
@@ -65,7 +82,7 @@ border-b-solid border-b-2 border-b-black pr-10"
           />
           <br />
           <button
-            className="p-4 bg-gray-300 mt-10 ml-28 w-64 rounded-3xl"
+            className="p-4 bg-slate-300 text-black mt-10 ml-28 w-64 rounded-3xl hover:bg-slate-400"
             onClick={changePwdHandler}
           >
             Change Password

@@ -6,12 +6,16 @@ import { useSelector, useDispatch } from "react-redux";
 import { authActions } from "../Store/redux";
 import { profileActions } from "../Store/ProfileSlice";
 
+import DarkTheme from "./DarkTheme";
+
 const Home = () => {
   // const ctx = useContext(AuthContext);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isPremium = useSelector((state) => state.expenses.isPremium);
   // const isloggedIn = useSelector((state) => state.auth.isloggedIn);
   const isloggedIn = localStorage.getItem("isLoggedIn");
+  const darkMode = useSelector((state) => state.darkTheme.darkTheme);
   console.log(isloggedIn);
   const isSignedUp = useSelector((state) => state.auth.isSignedUp);
   console.log(isSignedUp);
@@ -57,8 +61,10 @@ const Home = () => {
 
   return (
     <div
-      className="bg-gray-200 h-24  flex items-center pl-10
-    border-b-solid border-b-2 border-b-black pr-10"
+      className={`flex ${
+        darkMode ? "bg-black text-white" : "bg - gray - 200"
+      } h-24   items-center pl-10
+    border-b-solid border-b-2 border-b-black pr-10`}
     >
       {" "}
       <h1 className="text-4xl w-[800px]">Welcome To Expense Tracker!!!</h1>
@@ -74,7 +80,7 @@ const Home = () => {
         </h4>
       )}
       {isProfileUpdated && (
-        <h4 className="bg-stone-400 p-2.5 rounded-3xl ml-64  w-[900px] flex">
+        <h4 className="bg-stone-400 p-2.5 rounded-3xl ml-10  w-[900px] flex">
           Welcome Back <p className="font-bold ml-1">{dispName}</p> ! your
           Profile is 100% Completed.Go To
           <Link
@@ -85,15 +91,20 @@ const Home = () => {
           </Link>
         </h4>
       )}
+      {isPremium && (
+        <div className="ml-[100px]">
+          <DarkTheme />
+        </div>
+      )}
       <button
-        className="p-2 bg-gray-500 w-32 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
+        className="p-2 bg-gray-500 w-32 ml-10 rounded-3xl hover:bg-red-400 hover:text-white"
         onClick={() => navigate("/profile")}
       >
         Edit Profile
       </button>
       <button
         className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
-        onClick={() => dispatch(authActions.logout())}
+        onClick={() => dispatch(authActions.logout(navigate("/auth")))}
       >
         Log Out
       </button>

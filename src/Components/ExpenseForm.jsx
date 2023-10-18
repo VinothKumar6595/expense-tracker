@@ -6,12 +6,16 @@ import { addExpenseUrl } from "../utils/url";
 import { useDispatch, useSelector } from "react-redux";
 import { profileActions } from "../Store/ProfileSlice";
 import { authActions } from "../Store/redux";
+import DarkTheme from "./DarkTheme";
 
 const ExpenseForm = (props) => {
   // const ctx = useContext(AuthContext);
   const dispatch = useDispatch();
+  const darkMode = useSelector((state) => state.darkTheme.darkTheme);
   const editExpense = useSelector((state) => state.editing.isEditing);
+  const expensesFromRedux = useSelector((state) => state.expenses.expenses);
   const endpoint = localStorage.getItem("endpoint");
+  const isPremium = useSelector((state) => state.expenses.isPremium);
   const navigate = useNavigate("");
 
   const moneyChangeHandler = (event) => {
@@ -64,14 +68,17 @@ const ExpenseForm = (props) => {
     props.setSpentMoney("");
     props.setCategory("");
     props.SetExpense("");
-    props.setId("");
   };
 
   return (
     <div>
       <div
-        className="bg-gray-200 h-24  flex justify-between items-center pl-10
-    border-b-solid border-b-2 border-b-black pr-10"
+        className={`${
+          darkMode
+            ? "bg-black text-white border-b-solid border-b-2 border-b-white"
+            : "bg-gray-200 text-black border-b-solid border-b-2 border-b-black"
+        } h-24  flex justify-between items-center pl-10
+     pr-10`}
       >
         {" "}
         <h1
@@ -88,6 +95,11 @@ const ExpenseForm = (props) => {
         >
           Edit Profile
         </button> */}
+        {isPremium && (
+          <div className="ml-[1200px]">
+            <DarkTheme />
+          </div>
+        )}
         <button
           className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
           onClick={() => dispatch(authActions.logout(navigate("/auth")))}
@@ -95,7 +107,11 @@ const ExpenseForm = (props) => {
           Log Out
         </button>
       </div>
-      <div className="bg-gray-200 flex h-24 items-center text-xl font-serif font-semibold justify-around ">
+      <div
+        className={`flex ${
+          darkMode ? "bg-black text-white" : "bg-gray-200 text-black"
+        } h-24 items-center text-xl font-serif font-semibold justify-around `}
+      >
         <form onSubmit={addExpenseHandler}>
           <label className="p-5">Money Spent</label>
           <input
@@ -128,7 +144,13 @@ const ExpenseForm = (props) => {
             <option value="Petrol" />
             <option value="Salary" />
           </datalist>
-          <button className="bg-white p-2.5 rounded-3xl hover:bg-black hover:text-white">
+          <button
+            className={` p-2.5 ${
+              darkMode
+                ? "bg-gray-500 text-white hover:bg-slate-700"
+                : "bg-white text-black hover:bg-slate-300"
+            } rounded-3xl`}
+          >
             {editExpense ? "Edit Expense" : "Add Expenses"}
           </button>
         </form>

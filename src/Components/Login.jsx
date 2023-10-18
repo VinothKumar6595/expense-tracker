@@ -1,9 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { logInUrl, signUpUrl } from "../utils/url";
 // import AuthContext from "../Store/Auth-Context";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "../Store/redux";
+import axios from "axios";
+import { expenseActions } from "../Store/Expenses";
+import { addExpenseUrl } from "../utils/url";
 
 const Login = () => {
   // const ctx = useContext(AuthContext);
@@ -12,9 +15,46 @@ const Login = () => {
   const navigate = useNavigate();
   // const isloggedIn = useSelector((state) => state.auth.isloggedIn);
   const isloggedIn = localStorage.getItem("isLoggedIn");
+  const endpoint = localStorage.getItem("endpoint");
+  const isPremium = useSelector((state) => state.expenses.isPremium);
   console.log(isloggedIn);
   const isSignedUp = useSelector((state) => state.auth.isSignedUp);
   const token = localStorage.getItem("token");
+  const expenses = useSelector((state) => state.expenses.expenses);
+
+  useEffect(() => {
+    if (isloggedIn) {
+      const getExpenses = async () => {
+        try {
+          const response = await axios(
+            `${addExpenseUrl}${endpoint}/expenses.json`
+          );
+          const expenses = [];
+          console.log(response.data);
+          for (const key in response.data) {
+            expenses.push({
+              id: key,
+              spentMoney: response.data[key].spentMoney,
+              expense: response.data[key].expense,
+              category: response.data[key].category,
+            });
+          }
+          dispatch(expenseActions.addToExpense(expenses));
+          console.log(expenses);
+          const totalAmount = expenses.reduce((current, expense) => {
+            return current + Number(expense.spentMoney);
+          }, 0);
+          dispatch(expenseActions.addAmount(totalAmount));
+          console.log(totalAmount);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      navigate("/expenses");
+      getExpenses();
+    }
+  }, []);
+
   const [email, setEmail] = useState("");
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
@@ -138,7 +178,10 @@ const Login = () => {
       <div className=" flex items-center justify-center  m-auto  ">
         <button
           className="p-3 w-[360px]  rounded-lg bg-blue-400 text-white mt-10 hover:bg-gray-400 hover:text-white"
-          onClick={() => dispatch(authActions.signUp())}
+          onClick={(event) => {
+            event.preventDefault();
+            dispatch(authActions.signUp());
+          }}
         >
           {isSignedUp
             ? "Don't have an account? Sign-Up"

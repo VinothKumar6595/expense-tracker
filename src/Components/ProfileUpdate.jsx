@@ -15,8 +15,9 @@ const ProfileUpdate = () => {
   // const ctx = useContext(AuthContext);
   const dispatch = useDispatch();
   const endpoint = localStorage.getItem("endpoint");
-  const token = useSelector((state) => state.auth.token);
+  const token = localStorage.getItem("token");
   const isEmailVerified = useSelector((state) => state.profile.isEmailVerified);
+  const isPremium = useSelector((state) => state.expenses.isPremium);
   const isProfileUpdated = useSelector(
     (state) => state.profile.isProfileUpdated
   );
@@ -142,14 +143,20 @@ const ProfileUpdate = () => {
 border-b-solid border-b-2 border-b-black pr-10"
       >
         <h1 className="text-4xl">Expense Tracker</h1>
-        <h4 className="bg-stone-400 p-2.5 rounded-xl ml-[960px] w-96">
+        <h4 className="bg-stone-400 p-2.5 rounded-xl ml-[700px] w-96">
           {isProfileUpdated
             ? "User Profile is 100% Updated ! Move Forward to adding Expenses"
             : "Your Profile is Incomplete, Please Complete your profile to move further..."}
         </h4>
         <button
+          className="p-2 bg-gray-500 w-36 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
+          onClick={() => navigate(-1)}
+        >
+          Back To Home
+        </button>
+        <button
           className="p-2 bg-gray-500 w-24 ml-24 rounded-3xl hover:bg-red-400 hover:text-white"
-          onClick={() => dispatch(authActions.logout())}
+          onClick={() => dispatch(authActions.logout(navigate("/auth")))}
         >
           Log Out
         </button>

@@ -3,6 +3,7 @@ import ProfileSlice from "./ProfileSlice";
 import editSlice from "./EditSlice";
 import ExpensesSlice from "./Expenses";
 import { useNavigate } from "react-router-dom";
+import themeSlice from "./ThemeSlice";
 
 const initialAuthState = {
   //   logout: () => {},
@@ -47,6 +48,7 @@ const store = configureStore({
     profile: ProfileSlice.reducer,
     editing: editSlice.reducer,
     expenses: ExpensesSlice.reducer,
+    darkTheme: themeSlice.reducer,
   },
 });
 
