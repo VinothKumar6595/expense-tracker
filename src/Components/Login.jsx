@@ -16,7 +16,7 @@ const Login = () => {
   // const isloggedIn = useSelector((state) => state.auth.isloggedIn);
   const isloggedIn = localStorage.getItem("isLoggedIn");
   const endpoint = localStorage.getItem("endpoint");
-  const isPremium = useSelector((state) => state.expenses.isPremium);
+  const isPremium = localStorage.getItem("isPremium");
   console.log(isloggedIn);
   const isSignedUp = useSelector((state) => state.auth.isSignedUp);
   const token = localStorage.getItem("token");

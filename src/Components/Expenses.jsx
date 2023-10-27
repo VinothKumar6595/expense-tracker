@@ -132,7 +132,7 @@ const Expenses = (props) => {
     });
     console.log(resultData);
     const data = [[["id", "Spent Money", "Expense", "Category"]]];
-    for (var i = 0; i < resultData.length; i++) {
+    for (var i = 1; i < resultData.length; i++) {
       data.push(resultData[i]);
     }
     console.log(data);

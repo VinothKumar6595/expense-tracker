@@ -17,7 +17,7 @@ const ProfileUpdate = () => {
   const endpoint = localStorage.getItem("endpoint");
   const token = localStorage.getItem("token");
   const isEmailVerified = useSelector((state) => state.profile.isEmailVerified);
-  const isPremium = useSelector((state) => state.expenses.isPremium);
+  const isPremium = localStorage.getItem("isPremium");
   const isProfileUpdated = useSelector(
     (state) => state.profile.isProfileUpdated
   );

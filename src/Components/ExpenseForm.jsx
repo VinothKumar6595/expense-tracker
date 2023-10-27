@@ -15,7 +15,7 @@ const ExpenseForm = (props) => {
   const editExpense = useSelector((state) => state.editing.isEditing);
   const expensesFromRedux = useSelector((state) => state.expenses.expenses);
   const endpoint = localStorage.getItem("endpoint");
-  const isPremium = useSelector((state) => state.expenses.isPremium);
+  const isPremium = localStorage.getItem("isPremium");
   const navigate = useNavigate("");
 
   const moneyChangeHandler = (event) => {

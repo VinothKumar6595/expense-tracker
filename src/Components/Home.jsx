@@ -12,7 +12,7 @@ const Home = () => {
   // const ctx = useContext(AuthContext);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isPremium = useSelector((state) => state.expenses.isPremium);
+  const isPremium = localStorage.getItem("isPremium");
   // const isloggedIn = useSelector((state) => state.auth.isloggedIn);
   const isloggedIn = localStorage.getItem("isLoggedIn");
   const darkMode = useSelector((state) => state.darkTheme.darkTheme);

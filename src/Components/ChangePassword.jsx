@@ -12,7 +12,7 @@ const ChangePassword = () => {
   // const isloggedIn = useSelector((state) => state.auth.isloggedIn);
   const isloggedIn = localStorage.getItem("isLoggedIn");
   const darkMode = useSelector((state) => state.darkTheme.darkTheme);
-  const isPremium = useSelector((state) => state.expenses.isPremium);
+  const isPremium = localStorage.getItem("isPremium");
   const [email, setEmail] = useState("");
   const emailChangeHandler = (event) => {
     setEmail(event.target.value);
